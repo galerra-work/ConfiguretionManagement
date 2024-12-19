@@ -1,7 +1,5 @@
 # ConfiguretionManagement
-Задание 1:
 ![image](https://github.com/user-attachments/assets/e481836b-40ed-40ff-adf4-b32615749db1)
-Тесты:
 ![image](https://github.com/user-attachments/assets/be74b531-d259-405f-ab86-f1c230c90b63)
 ![image](https://github.com/user-attachments/assets/3fea987e-4607-43a0-85ab-1d753d64725b)
 ![image](https://github.com/user-attachments/assets/9a12c170-cb26-4512-b6a7-17b714bc6aa8)
@@ -15,6 +13,7 @@
 ![image](https://github.com/user-attachments/assets/08a3e1d7-4e6a-42e2-b4f5-36896a76f7e6)
 ![image](https://github.com/user-attachments/assets/34046963-4ef9-4f0f-876f-65c6385543a9)
 ![image](https://github.com/user-attachments/assets/d3835e81-c5b1-491e-9d28-21625c0409c8)
+![image](https://github.com/user-attachments/assets/99f12549-3671-4fff-822e-118600add97b)
 
 
 
