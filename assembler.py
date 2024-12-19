@@ -1,62 +1,53 @@
-import struct
-import yaml
 import sys
+import yaml
 
-def assemble_instruction(command, args):
-    print(command, args)
-    if command == "LOAD_CONST":
-        # Пример для LOAD_CONST A B C
-        assert len(args) == 3, "LOAD_CONST requires 3 arguments"
-        A, B, C = args
-        return struct.pack("<BHI", A, B, C)  # Пакуем в байты
-    
-    elif command == "LOAD_MEM":
-        print("Я в load_mem")
-        # Пример для LOAD_MEM A B C
-        assert len(args) == 3, "LOAD_MEM requires 3 arguments"
-        A, B, C = args
-        return struct.pack("<BHI", A, B, C)
+OPCODES = {
+    'LOADCONST': 195,
+    'OR': 74
+}
 
-    elif command == "WRITE_MEM":
-        # Пример для WRITE_MEM A B C D
-        assert len(args) == 4, "WRITE_MEM requires 4 arguments"
-        A, B, C, D = args
-        return struct.pack("<BHIH", A, B, C, D)
-    
-    else:
-        raise ValueError(f"Unknown command: {command}")
+def assemble_line(line):
+    parts = line.strip().split()
+    mnemonic = parts[0]
+    args = dict(arg.split('=') for arg in parts[1:])
+    A = OPCODES[mnemonic]
+    B = int(args.get('B', 0))
+    C = int(args.get('C', 0))
+    D = int(args.get('D', 0))
+    if mnemonic == 'LOADCONST':
+        instr_bits = (A & 0xFF)
+        instr_bits |= (B & ((1 << 27)-1)) << 8
+        instr_bits |= (C & ((1 << 26)-1)) << 35
+        return instr_bits.to_bytes(12, 'little'), {'A': A, 'B': B, 'C': C}
+    elif mnemonic == 'OR':
+        instr_bits = (A & 0xFF)
+        instr_bits |= (B & ((1 << 27)-1)) << 8
+        instr_bits |= (C & ((1 << 27)-1)) << 35
+        instr_bits |= (D & ((1 << 27)-1)) << 62
+        return instr_bits.to_bytes(12, 'little'), {'A': A, 'B': B, 'C': C, 'D': D}
+    return (b'\x00' * 12), {}
 
-# Ассемблер
-def assemble(input_file, output_binary, output_log):
-    with open(input_file, "r") as infile:
-        lines = infile.readlines()
+def main():
+    if len(sys.argv) < 4:
+        print("Usage: python3 assembler.py <input.asm> <output.bin> <log.yaml>")
+        sys.exit(1)
+    asm_file = sys.argv[1]
+    bin_file = sys.argv[2]
+    log_file = sys.argv[3]
+    instructions = []
+    with open(asm_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                instr_bytes, info = assemble_line(line)
+                instructions.append((instr_bytes, info))
+    with open(bin_file, 'wb') as f:
+        for instr_bytes, _ in instructions:
+            f.write(instr_bytes)
+    log_data = [info for _, info in instructions]
+    with open(log_file, 'w') as f:
+        yaml.dump(log_data, f)
 
-    binary_code = bytearray()  # Массив для бинарного кода
-    log = {}  # Лог для YAML
+if __name__ == '__main__':
+    main()
 
-    for line in lines:
-        # Разбиваем команду на части
-        parts = line.strip().split()
-        command = parts[0]
-        args = list(map(int, parts[1:]))
-
-        # Ассемблируем команду
-        binary = assemble_instruction(command, args)
-        binary_code.extend(binary)
-
-        # Записываем в лог
-        log[f"{command} {' '.join(map(str, args))}"] = list(binary)
-
-    # Сохраняем бинарный файл
-    with open(output_binary, "wb") as bin_file:
-        bin_file.write(binary_code)
-
-    # Сохраняем лог в формате YAML
-    with open(output_log, "w") as log_file:
-        yaml.dump(log, log_file, default_flow_style=False)
-
-if __name__ == "__main__":
-    input_file = sys.argv[1]  # Путь к входному файлу
-    output_binary = sys.argv[2]  # Путь к бинарному файлу
-    output_log = sys.argv[3]  # Путь к файлу лога
-    assemble(input_file, output_binary, output_log)
