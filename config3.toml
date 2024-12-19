@@ -1,0 +1,4 @@
+homeworks = << 1, 2, 3, 4 >>
+my_fav_lesson = "Config"
+max_love = abs(-1)
+2

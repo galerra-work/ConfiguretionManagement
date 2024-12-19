@@ -1,0 +1,8 @@
+/*
+я очень хочу спать
+*/
+
+var homeworks << 1, 2, 3, 4 >>;
+var my_fav_lesson "Config";
+var max_love abs(-1);
+|1 1 +|
